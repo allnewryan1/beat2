@@ -3,6 +3,7 @@ package com.gladen.beat;
 import java.util.regex.Pattern;
 
 /**
+ * licensed for use under Apache 2.0
  * https://github.com/sedmelluq
  */
 class Patterns {

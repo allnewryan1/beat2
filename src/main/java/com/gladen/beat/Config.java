@@ -1,20 +1,20 @@
 package com.gladen.beat;
 
-import com.kaaz.configuration.ConfigurationOption;
+//TODO change this shit
+
+/**
+ * COPYRIGHT Gladen Software 2018
+ */
 
 public class Config {
-    @ConfigurationOption
+
+    public static boolean DEBUG = false;
+
     public static String discord_token = "your-discord-token";
 
-    @ConfigurationOption
     public static String command_prefix = "!";
 
-    @ConfigurationOption
-    public static int volume = 30;
+    public static int volume = 100;
 
-    @ConfigurationOption
-    public static String voice_channel_id = "channel-id";
-
-    @ConfigurationOption
     public static String yt_api_key = "your-youtube-api-key";
 }

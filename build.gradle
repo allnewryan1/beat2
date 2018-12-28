@@ -1,14 +1,14 @@
 plugins {
     id 'java'
     id 'application'
-    id 'com.github.johnrengelman.shadow' version '2.0.1'
+    id 'com.github.johnrengelman.shadow' version '4.0.2'
     id 'com.sedmelluq.jdaction' version '1.0.2'
 }
 
 group 'Beat'
-version '5.1'
+version '1.0'
 
-mainClassName = "com.gladen.beat.Login"
+mainClassName = "com.gladen.beat.Main"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -18,6 +18,14 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
+}
+
 
 dependencies {
     //Lavaplayer
@@ -25,11 +33,7 @@ dependencies {
     //Nas for audio sending
     compile group: 'com.sedmelluq', name: 'jda-nas', version: '1.0.6'
     //JDA
-    compile group: 'net.dv8tion', name: 'JDA', version: '3.5.0_335'
-    //Configuration builder
-    compile group: 'com.github.kaaz', name: 'configurationbuilder', version: '0.4'
-    //Logback
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile 'net.dv8tion:JDA:3.8.1_450'
 
 }
 
