@@ -52,6 +52,9 @@ public class Controller extends AudioEventAdapter  {
             public void run() {
                 disconnectVoice();
                 Login.Jda.shutdownNow();
+                System.out.flush();
+                System.err.flush();
+                if (!Config.DEBUG) System.setErr(Main.err);
             }
         });
         init();
@@ -62,18 +65,18 @@ public class Controller extends AudioEventAdapter  {
             if (!desiredChannel.isEmpty()) cChannel = Login.Jda.getVoiceChannelById(desiredChannel);
             //else cChannel = Login.Jda.getVoiceChannelById(Config.voice_channel_id);
             if (cChannel == null) {
-                System.out.println("Could not find hardcoded channel, make sure the ID is correct and that the bot can see it.");
+                Main.out.println("Could not find hardcoded channel, make sure the ID is correct and that the bot can see it.");
                 return false;
             }
         }
         AudioManager audioManager = cChannel.getGuild().getAudioManager();
         try {
             audioManager.openAudioConnection(cChannel);
-            System.out.println("Joined voice channel " + cChannel.getName());
+            Main.out.println("Joined voice channel " + cChannel.getName());
             audioManager.setSendingHandler(new AudioPlayerSendHandler(player));
             return true;
         } catch (Exception ex) {
-            System.out.println("Failed to join the voice channel! " + ex.getMessage());
+            Main.out.println("Failed to join the voice channel! " + ex.getMessage());
             return false;
         }
     }
@@ -84,11 +87,11 @@ public class Controller extends AudioEventAdapter  {
         AudioManager audioManager = cChannel.getGuild().getAudioManager();
         try {
             audioManager.openAudioConnection(cChannel);
-            System.out.println("Joined voice channel " + cChannel.getName());
+            Main.out.println("Joined voice channel " + cChannel.getName());
             audioManager.setSendingHandler(new AudioPlayerSendHandler(player));
             return true;
         } catch (Exception ex) {
-            System.out.println("Failed to join the voice channel! " + ex.getMessage());
+            Main.out.println("Failed to join the voice channel! " + ex.getMessage());
             return false;
         }
     }
@@ -112,7 +115,7 @@ public class Controller extends AudioEventAdapter  {
 
     public void init() {
         q = new Queue();
-        System.out.println("Ready to play!");
+        Main.out.println("Ready to play!");
         /*
         if (player.getPlayingTrack() == null) {
             nextTrack();
@@ -177,7 +180,7 @@ public class Controller extends AudioEventAdapter  {
 
             @Override
             public void trackLoaded(AudioTrack track) {
-                System.out.println("[Now Playing] " + track.getInfo().title);
+                Main.out.println("[Now Playing] " + track.getInfo().title);
                 player.startTrack(track, false);
                 Login.Jda.getPresence().setGame(Game.playing("▶ " + track.getInfo().title));
                 String uri = track.getInfo().uri;
@@ -243,7 +246,7 @@ public class Controller extends AudioEventAdapter  {
 
 
     protected void proccessTracks(List<String> input) {
-        System.out.println("Processing " + input.size() + " songs on current playlist");
+        Main.out.println("Processing " + input.size() + " songs on current playlist");
         for (String song : new ArrayList<>(input)) {
             if (isPlaylist(song)) {
                 parsePlaylist(song, input);
@@ -252,11 +255,11 @@ public class Controller extends AudioEventAdapter  {
         if (input.isEmpty()) {
             System.err.println("No supported songs found!");
         }
-        System.out.println(input.size() + " songs loaded");
+        Main.out.println(input.size() + " songs loaded");
     }
 
     private void parsePlaylist(String song, List<String> input) {
-        System.out.println("Found a playlist, parsing");
+        Main.out.println("Found a playlist, parsing");
         try {
             playerManager.loadItem(song, new AudioLoadResultHandler() {
                 @Override
@@ -270,7 +273,7 @@ public class Controller extends AudioEventAdapter  {
                         String uri = tr.getInfo().uri;
                         if (!input.contains(uri)) input.add(uri);
                     }
-                    System.out.println("Parsed playlist with " + playlist.getTracks().size() + " songs");
+                    Main.out.println("Parsed playlist with " + playlist.getTracks().size() + " songs");
                 }
 
                 @Override
@@ -333,10 +336,12 @@ public class Controller extends AudioEventAdapter  {
                 while (scanner.hasNextLine()) {
                     queue.add(scanner.nextLine());
                 }
+                scanner.close();
             } catch (FileNotFoundException e) {
                 System.err.println("Could not find songs.txt");
             }
             proccessTracks(queue);
+            file = null;
         }
 
         public List<TrackInfo> list() {
@@ -386,6 +391,7 @@ public class Controller extends AudioEventAdapter  {
                     writer.newLine();
                     }
                 writer.close();
+                cFile = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }

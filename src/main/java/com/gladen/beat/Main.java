@@ -8,8 +8,11 @@ import java.io.*;
 import java.awt.GraphicsEnvironment;
 import java.net.URISyntaxException;
 
+import javax.swing.SwingUtilities;
+
 public class Main{
     public static PrintStream err = new PrintStream(System.err);
+    public static PrintStream out;
     static DummyPrefs prefs;
 
     public static void main (String [] args) throws IOException, InterruptedException, URISyntaxException{
@@ -17,9 +20,14 @@ public class Main{
         if (!Config.DEBUG) System.setErr(new PrintStream(new NullOutputStream()));
         Console console = System.console();
         if(console == null && !GraphicsEnvironment.isHeadless()){
-            String filename = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath().substring(1);
-             Runtime.getRuntime().exec(new String[]{"cmd","/k","start","\"Beat - music unleashed!\" java.exe -jar \"" + filename + "\""});
+            CommandWindow window = new CommandWindow();
+            out = window.out;
+            SwingUtilities.invokeLater(() -> {
+                window.setVisible(true);
+            });
+            Login.main(new String[0]);
         } else{
+            out = System.out;
             Login.main(new String[0]);
             //System.exit(0);
         }

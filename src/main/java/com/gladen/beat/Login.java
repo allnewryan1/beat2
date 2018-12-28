@@ -5,7 +5,6 @@ package com.gladen.beat;
  */
 
 import com.sedmelluq.discord.lavaplayer.jdaudp.NativeAudioSendFactory;
-import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 
@@ -27,24 +26,23 @@ public class Login {
                           "|  0   0  0     0   0    0            0   0  0   0    0     |\n" +
                           "|  0000   0000  0   0    0            0000    000     0     |\n" +
                           "=============================================================";
-            System.out.println(open);
+            Main.out.println(open);
         }
         try {
             if (isNas()) {
-                System.err.println("Native audio support is enabled");
-                Jda = new JDABuilder(AccountType.BOT)
-                        .setToken(Config.discord_token)
+                Main.err.println("Native audio support is enabled");
+                Jda = new JDABuilder(Config.discord_token)
                         .setAudioSendFactory(new NativeAudioSendFactory())
-                        .buildBlocking();
+                        .build();
             } else {
-                Jda = new JDABuilder(AccountType.BOT)
-                        .setToken(Config.discord_token)
-                        .buildBlocking();
+                Jda = new JDABuilder(Config.discord_token)
+                        .build();
             }
+            Jda.awaitReady();
             Jda.addEventListener(new MessageHandler());
-            System.out.println("\n\n..........................................................................................................");
-            System.out.println("Use this url to add me:\n" + "https://discordapp.com/oauth2/authorize?client_id=" + Jda.getSelfUser().getId() + "&scope=bot&permissions=37215296");
-            System.out.println("..........................................................................................................\n\n");
+            Main.out.println("\n\n..........................................................................................................");
+            Main.out.println("Use this url to add me:\n" + "https://discordapp.com/oauth2/authorize?client_id=" + Jda.getSelfUser().getId() + "&scope=bot&permissions=37215296");
+            Main.out.println("..........................................................................................................\n\n");
         } catch (LoginException | InterruptedException e) {
             e.printStackTrace();
             System.exit(1);

@@ -46,7 +46,6 @@ public class MessageHandler extends ListenerAdapter {
         if (cmd.contains(" ")) {
             if (cmd.startsWith("play") || cmd.startsWith("add")) args = cmd.split(" ", 2);
             else args = cmd.split(" ");
-            System.err.println(cmd);
             cmd = args[0];
         }
         TextChannel c = e.getChannel();
@@ -107,10 +106,6 @@ public class MessageHandler extends ListenerAdapter {
                 if (args[1] == null || args[1].isEmpty()) {
                     c.sendMessage("").queue();
                     break;
-                }
-                System.err.println("arguments:");
-                for (String s : args) {
-                    System.err.println(s);
                 }
                 String addUrl = yt.query(args[1]);
                 Login.audio.q.add(addUrl);
