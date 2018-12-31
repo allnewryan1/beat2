@@ -17,19 +17,19 @@ public class Main{
 
     public static void main (String [] args) throws IOException, InterruptedException, URISyntaxException{
         prefs = new DummyPrefs();
-        if (!Config.DEBUG) System.setErr(new PrintStream(new NullOutputStream()));
+        System.setErr(new PrintStream(new NullOutputStream()));
         Console console = System.console();
         if(console == null && !GraphicsEnvironment.isHeadless()){
-            CommandWindow window = new CommandWindow();
-            out = window.out;
+            CommandWindow commandWindow = new CommandWindow();
+            out = commandWindow.out;
+            //System.setErr(out);
             SwingUtilities.invokeLater(() -> {
-                window.setVisible(true);
+                commandWindow.setVisible(true);
             });
             Login.main(new String[0]);
         } else{
             out = System.out;
             Login.main(new String[0]);
-            //System.exit(0);
         }
     }
 

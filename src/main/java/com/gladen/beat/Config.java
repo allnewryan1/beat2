@@ -1,7 +1,5 @@
 package com.gladen.beat;
 
-//TODO change this shit
-
 /**
  * COPYRIGHT Gladen Software 2018
  */

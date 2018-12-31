@@ -3,36 +3,40 @@ package com.gladen.beat;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.text.BadLocationException;
+import javax.swing.SwingUtilities;
 
 public class CommandWindow extends JFrame {
+    private static final long serialVersionUID = 550987585;
+
     /**
      * The text area which is used for displaying logging information.
      */
     private JTextArea textArea;
     public PrintStream out;
 
-    private JButton buttonExit = new JButton("Exit");
-
     public CommandWindow() {
         super("Beat - music unleashed!");
         JMenuBar menubar = new JMenuBar();
         JMenu menu = new JMenu("File");
         JMenuItem config = new JMenuItem("Config");
-        config.addActionListener(e -> {});//TODO add config window
+        /*
+        ConfigWindow window = new ConfigWindow();
+        config.addActionListener(e -> {
+            SwingUtilities.invokeLater(() -> {
+                window.setVisible(true);
+            });
+        });
+        */
         JMenuItem exit = new JMenuItem("Exit");
         exit.addActionListener(e -> {
             System.exit(0);
@@ -60,23 +64,11 @@ public class CommandWindow extends JFrame {
 
         add(new JScrollPane(textArea), constraints);
 
-        buttonExit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                System.exit(0);
-            }
-        });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(720, 320);
-        setLocationRelativeTo(null);    // centers on screen
+        setLocationRelativeTo(null);
     }
 
-    /**
-     * Runs the program
-     */
-    public static void main(String[] args) {
-
-    }
     public class CustomOutputStream extends OutputStream {
         private JTextArea textArea;
 

@@ -36,13 +36,13 @@ public class MessageHandler extends ListenerAdapter {
         } else {
             Login.audio.desiredChannel = userChannel.getId();
         }
-        if (System.currentTimeMillis() - lastMessageRecieved <= 3000) {
+        if (System.currentTimeMillis() - lastMessageRecieved <= 2000) {
             e.getChannel().sendMessage("Slow down there pal!  (Command not executed)").queue();
             return;
         }
         lastMessageRecieved = System.currentTimeMillis();
         String cmd = msg.substring(PF.length());
-        String[] args = new String[2];
+        String[] args = new String[8];
         if (cmd.contains(" ")) {
             if (cmd.startsWith("play") || cmd.startsWith("add")) args = cmd.split(" ", 2);
             else args = cmd.split(" ");
@@ -142,28 +142,34 @@ public class MessageHandler extends ListenerAdapter {
                 Login.audio.setVolume(newVol);
                 break;
             case "queue": //TODO queue manipulation (shuffle)
-                if (!Config.DEBUG) {
-                    c.sendMessage("Functionality coming soon").queue();
-                }
-                else {
-                    if (args[1] == null || args[1].isEmpty()) {
-                        c.sendMessage(new EmbedBuilder()
+                if (args[1] == null || args[1].isEmpty()) {
+                    c.sendMessage(new EmbedBuilder()
                         .setTitle("Queue Commands")
                         .addField("list", "list songs currently in queue", false)
                         .addField("clear", "clears the queue", false)
                         .addField("remove", "remove song at given position", false)
                         .build()).queue();
-                        break;
+                    break;
                     }
-                    if (args[1].equals("list")) {
-                        EmbedBuilder list = new EmbedBuilder();
-                        List<Controller.TrackInfo> infoList = Login.audio.q.list();
-                        list.setTitle("Queue");
-                        for (Controller.TrackInfo info : infoList) {
-                            if (infoList.indexOf(info) == infoList.size() - 1) list.addField("Now Playing", info.title, false);
-                            else list.addField(String.valueOf(infoList.indexOf(info) + 1), info.title, false);
+                if (args[1].equals("list")) {
+                    boolean shortlist = true;
+                    try {
+                        if (args[2] !=null && args[2].equals("all")) shortlist = false;
+                    } catch (ArrayIndexOutOfBoundsException fuckingStupid) {}
+                    EmbedBuilder list = new EmbedBuilder();
+                    List<Controller.TrackInfo> infoList = Login.audio.q.list();
+                    list.setTitle("Queue");
+                    String nowplaying = "";
+                    if (Login.audio.getPlayingTrack() != null) nowplaying = Login.audio.getPlayingTrack().getInfo().title;
+                    Controller.TrackInfo info;
+                    if (!nowplaying.isEmpty()) list.addField("Now Playing:", nowplaying, false);
+                    for (int i = 0; i < infoList.size(); i++) {
+                        info = infoList.get(i);
+                        if (nowplaying.equals(info.title)) ; //do fuckall
+                        else list.addField(String.valueOf(infoList.indexOf(info) + 1) + ":", info.title, false);
+                        if (shortlist && i == 5) i = infoList.size();
                         }
-                        c.sendMessage(list.build()).queue();
+                    c.sendMessage(list.build()).queue();
                     } else if (args[1].equals("clear")) {
                         Login.audio.stop();
                         Login.audio.q.clear();
@@ -171,7 +177,7 @@ public class MessageHandler extends ListenerAdapter {
                     } if (args[1].equals("remove")) {
                         if (args[2] != null) {
                             try {
-                                int pos = Integer.valueOf(args[2]);
+                                int pos = Integer.valueOf(args[2]) - 1;
                                 String removedUrl = Login.audio.q.remove(pos);
                                 String removedTitle = yt.getTrackInfo(removedUrl).title;
                                 c.sendMessage("Removed: " + removedTitle).queue();
@@ -186,7 +192,6 @@ public class MessageHandler extends ListenerAdapter {
                         .build()).queue();
                         break;
                     }
-                }
                 break;
             default:
                 break;
