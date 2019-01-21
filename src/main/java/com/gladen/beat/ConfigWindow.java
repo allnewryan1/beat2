@@ -30,10 +30,10 @@ public class ConfigWindow extends JFrame {
    JLabel lbSv_l;
    JSlider sdV_slide;
    JTextField tfV_text;
-   JComboBox cmbTc_list;
+   JComboBox<String> cmbTc_list;
    JLabel lbTc_l;
    JLabel lbVc_l;
-   JComboBox cmbVc_list;
+   JComboBox<String> cmbVc_list;
    JButton btCancel;
    JButton btSave;
 
@@ -158,7 +158,8 @@ public class ConfigWindow extends JFrame {
       add(tfV_text);
 
       List<TextChannel> txtChl = Login.Jda.getTextChannels();
-      cmbTc_list = new JComboBox(txtChl.toArray());
+      String[] txtArray = txtChl.toArray(new String[txtChl.size()]);
+      cmbTc_list = new JComboBox<String>(txtArray);
       gbcConfigWindow.gridx = 1;
       gbcConfigWindow.gridy = 4;
       gbcConfigWindow.gridwidth = 1;
@@ -195,7 +196,8 @@ public class ConfigWindow extends JFrame {
       add(lbVc_l);
 
       List<VoiceChannel> voChl = Login.Jda.getVoiceChannels();
-      cmbVc_list = new JComboBox(voChl.toArray());
+      String[] voArray = voChl.toArray(new String[voChl.size()]);
+      cmbVc_list = new JComboBox<String>(voArray);
       gbcConfigWindow.gridx = 1;
       gbcConfigWindow.gridy = 5;
       gbcConfigWindow.gridwidth = 1;
@@ -237,6 +239,10 @@ public class ConfigWindow extends JFrame {
       gbcConfigWindow.anchor = GridBagConstraints.NORTH;
       gbConfigWindow.setConstraints(btSave, gbcConfigWindow);
       add(btSave);
+
+    setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+    setSize(720, 320);
+    setLocationRelativeTo(null);
    }
 
 }

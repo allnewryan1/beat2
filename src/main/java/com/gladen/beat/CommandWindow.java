@@ -13,7 +13,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
+//import javax.swing.SwingUtilities;
 
 public class CommandWindow extends JFrame {
     private static final long serialVersionUID = 550987585;
@@ -33,7 +33,7 @@ public class CommandWindow extends JFrame {
         ConfigWindow window = new ConfigWindow();
         config.addActionListener(e -> {
             SwingUtilities.invokeLater(() -> {
-                window.setVisible(true);
+                window.setVisible(true);    //currently broken
             });
         });
         */

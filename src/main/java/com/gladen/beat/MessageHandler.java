@@ -91,16 +91,16 @@ public class MessageHandler extends ListenerAdapter {
                     .addField("Length", String.format("`%s / %s`", this.getLength(PlayingTrack.getPosition()), this.getLength(PlayingTrack.getInfo().length)), true)
                     .addField("Song Link", "[Youtube Link](" + PlayingTrack.getInfo().uri + ")", true)
                     .setThumbnail(String.format("https://img.youtube.com/vi/%s/hqdefault.jpg", PlayingTrack.getInfo().identifier))
-                    .build()
-            ).queue();
+                    .build()).queue();
                 break;
             case "stop":
-                    c.sendMessage("Playback stopped").queue();
-                    Login.audio.stop();
+                c.sendMessage("Playback stopped").queue();
+                Login.audio.stop();
                 break;
             case "skip":
-                    c.sendMessage("Skipping to next available track").queue();
-                    Login.audio.skip();
+                c.sendMessage("Skipping to next available track").queue();
+                Login.audio.skip();
+                Login.audio.q.onModify();
                 break;
             case "add":
                 if (args[1] == null || args[1].isEmpty()) {
@@ -109,6 +109,7 @@ public class MessageHandler extends ListenerAdapter {
                 }
                 String addUrl = yt.query(args[1]);
                 Login.audio.q.add(addUrl);
+                Login.audio.q.onModify();
                 String title = yt.getTrackInfo(addUrl).title;
                 c.sendMessage("Added \"" + title + "\" to the queue").queue();
                 break;
