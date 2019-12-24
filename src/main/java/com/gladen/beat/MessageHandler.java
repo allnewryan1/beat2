@@ -7,11 +7,11 @@ package com.gladen.beat;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.VoiceChannel;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.awt.Color;
 import java.util.List;
@@ -75,16 +75,38 @@ public class MessageHandler extends ListenerAdapter {
         YT yt = new YT();
         switch (cmd) {
             case "help":
-                //TODO make help text
+                if (args[1] == null || args[1].isEmpty()) {
+                c.sendMessage(new EmbedBuilder()
+                    .setTitle("Available Commands")
+                    .addField("'play', 'play (search string)''", "With no args, plays the current queue. With (search string) plays the first result returned from YouTube", false)
+                    .addField("add", "adds a song to the queue but does not immediately begin playback", false)
+                    .addField("stop", "Stops playback, does not currently reset the queue (next 'play' command will start next song in queue)", false)
+                    .addField("'nowplaying', 'now', 'np'", "Displays the current song info", false)
+                    .addField("skip","Skips to the next song in the queue", false)
+                    .addField("volume (number 1-100)", "Sets server playback volume to specified value. Note this does not affect any users individual volume setting on the bot itself", false)
+                    .addField("queue", "Queue manipulation. For more details use '(command symbol)help queue'", false)
+                .build()).queue();
+                    break;
+                }
+                if (args[1].equals("queue")) {
+                    c.sendMessage(new EmbedBuilder()
+                        .setTitle("Queue Commands")
+                        .addField("list", "list songs currently in queue", false)
+                        .addField("clear", "clears the queue", false)
+                        .addField("remove", "remove song at given position", false)
+                    .build()).queue();
+                }
                 break;
             case "np":
+            case "now":
+            case "nowplaying":
                 AudioTrack PlayingTrack = Login.audio.getPlayingTrack();
                 if (PlayingTrack == null) {
                     c.sendMessage("Nothing currently playing.").queue();
                     break;
                 }
                 c.sendMessage(new EmbedBuilder()
-                    .setAuthor("Now Playing", PlayingTrack.getInfo().uri, null)
+                    .setAuthor("Now Playing")
                     .setColor(Color.RED)
                     .addField("Song Name", PlayingTrack.getInfo().title, true)
                     .addField("Channel", PlayingTrack.getInfo().author, true)

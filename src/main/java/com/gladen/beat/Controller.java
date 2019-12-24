@@ -28,9 +28,9 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
-import net.dv8tion.jda.core.entities.Game;
-import net.dv8tion.jda.core.entities.VoiceChannel;
-import net.dv8tion.jda.core.managers.AudioManager;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 public class Controller extends AudioEventAdapter  {
     String desiredChannel = "";
@@ -131,7 +131,7 @@ public class Controller extends AudioEventAdapter  {
     public void stop() {
         player.stopTrack();
         disconnectVoice();
-        Login.Jda.getPresence().setGame(null);
+        Login.Jda.getPresence().setActivity(null);
     }
 
     public void play() {
@@ -182,7 +182,7 @@ public class Controller extends AudioEventAdapter  {
             public void trackLoaded(AudioTrack track) {
                 Main.out.println("[Now Playing] " + track.getInfo().title);
                 player.startTrack(track, false);
-                Login.Jda.getPresence().setGame(Game.playing("▶ " + track.getInfo().title));
+                Login.Jda.getPresence().setActivity(Activity.playing("▶ " + track.getInfo().title));
                 String uri = track.getInfo().uri;
                 if (!q.queue.contains(uri)) q.queue.add(uri);
                 if (!callbacks.isEmpty()) {
@@ -214,8 +214,8 @@ public class Controller extends AudioEventAdapter  {
     }
 
     protected void nextTrack() {
-        //String song = getRandomSong(queue);
         String song = q.queue.get(0);
+        // if (shuffle) song = getRandomSong(queue);
         loadTrack(song);
         q.queue.remove(0);
         q.queue.add(song); //for endless mode
