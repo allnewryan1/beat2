@@ -84,7 +84,7 @@ public class MessageHandler extends ListenerAdapter {
                     .addField("'nowplaying', 'now', 'np'", "Displays the current song info", false)
                     .addField("skip","Skips to the next song in the queue", false)
                     .addField("volume (number 1-100)", "Sets server playback volume to specified value. Note this does not affect any users individual volume setting on the bot itself", false)
-                    .addField("queue", "Queue manipulation. For more details use '(command symbol)help queue'", false)
+                    .addField("queue", "Queue manipulation. For more details use '" + Config.command_prefix + "help queue'", false)
                 .build()).queue();
                     break;
                 }

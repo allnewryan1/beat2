@@ -243,6 +243,7 @@ public class ConfigWindow extends JFrame {
     setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
     setSize(720, 320);
     setLocationRelativeTo(null);
+    setVisible(true);
    }
 
 }

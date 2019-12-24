@@ -182,7 +182,7 @@ public class Controller extends AudioEventAdapter  {
             public void trackLoaded(AudioTrack track) {
                 Main.out.println("[Now Playing] " + track.getInfo().title);
                 player.startTrack(track, false);
-                Login.Jda.getPresence().setActivity(Activity.playing("▶ " + track.getInfo().title));
+                Login.Jda.getPresence().setActivity(Activity.listening("▶ " + track.getInfo().title));
                 String uri = track.getInfo().uri;
                 if (!q.queue.contains(uri)) q.queue.add(uri);
                 if (!callbacks.isEmpty()) {
