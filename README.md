@@ -1,6 +1,6 @@
 # Beat
 
-To be announced...
+Beat Music Bot for Discord
 
 ## Instructions
 To be announced...
