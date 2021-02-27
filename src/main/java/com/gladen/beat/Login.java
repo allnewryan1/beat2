@@ -1,23 +1,32 @@
 package com.gladen.beat;
 
-/**
- * COPYRIGHT Gladen Software 2018
+/*
+ * COPYRIGHT Gladen Software 2020
  */
 
 import com.sedmelluq.discord.lavaplayer.jdaudp.NativeAudioSendFactory;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.utils.cache.SnowflakeCacheView;
 
 import javax.security.auth.login.LoginException;
+import java.util.ArrayList;
+import java.util.List;
 
 //TODO add license file, uses lavaplayer under Apache 2.0 license
 
 public class Login {
     static JDA Jda;
     static Controller audio;
+    public static List<String> textChannels = new ArrayList<>();
+    public static List<String> voiceChannels = new ArrayList<>();
+    public static String[] textChannels1;
+    public static String[] voiceChannels1;
 
-    public static void main(String args[]) {
-        if (Config.DEBUG) {
+    public static void main(String[] args) {
+        if (build.type == build.TYPE.DEBUG) {
             /*
             //Open message
             String open = "============================================================\n" +
@@ -40,12 +49,12 @@ public class Login {
         }
         try {
             if (isNas()) {
-                Main.err.println("Native audio support is enabled");
-                Jda = new JDABuilder(Config.discord_token)
+                Debug.log("Native audio support is enabled");
+                Jda = JDABuilder.createDefault(Config.discord_token)
                         .setAudioSendFactory(new NativeAudioSendFactory())
                         .build();
             } else {
-                Jda = new JDABuilder(Config.discord_token)
+                Jda = JDABuilder.createDefault(Config.discord_token)
                         .build();
             }
             Jda.awaitReady();
@@ -58,10 +67,28 @@ public class Login {
             System.exit(1);
         }
         audio = new Controller();
+        SnowflakeCacheView<TextChannel> textTemp = Jda.getTextChannelCache();
+        SnowflakeCacheView<VoiceChannel> voiceTemp = Jda.getVoiceChannelCache();
+        for (TextChannel c : textTemp) {
+            textChannels.add(c.getName());
+        }
+        for (VoiceChannel v : voiceTemp) {
+            voiceChannels.add(v.getName());
+        }
+        textChannels1 = new String[textChannels.size()];
+        for (int i = 0; i < textChannels.size(); i++) {
+            textChannels1[i] = textChannels.get(i);
+        }
+
+        voiceChannels1 = new String[voiceChannels.size()];
+        for (int i = 0; i < voiceChannels.size(); i++) {
+            voiceChannels1[i] = voiceChannels.get(i);
+        }
     }
 
     private static boolean isNas() {
         String os = System.getProperty("os.name");
+        Debug.log(os);
         return (os.contains("Windows") || os.contains("Linux"))
                 && !System.getProperty("os.arch").equalsIgnoreCase("arm")
                 && !System.getProperty("os.arch").equalsIgnoreCase("arm-linux");

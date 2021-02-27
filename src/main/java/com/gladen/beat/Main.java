@@ -1,12 +1,11 @@
 package com.gladen.beat;
 
-/**
- * COPYRIGHT Gladen Software 2018
+/*
+ * COPYRIGHT Gladen Software 2020
  */
 
 import java.io.*;
 import java.awt.GraphicsEnvironment;
-import java.net.URISyntaxException;
 
 import javax.swing.SwingUtilities;
 
@@ -15,22 +14,18 @@ public class Main{
     public static PrintStream out;
     static DummyPrefs prefs;
 
-    public static void main (String [] args) throws IOException, InterruptedException, URISyntaxException{
-        prefs = new DummyPrefs();
+    public static void main (String [] args) {
+        prefs = DummyPrefs.getPrefs();
         System.setErr(new PrintStream(new NullOutputStream()));
         Console console = System.console();
         if(console == null && !GraphicsEnvironment.isHeadless()){
             CommandWindow commandWindow = new CommandWindow();
             out = commandWindow.out;
-            //System.setErr(out);
-            SwingUtilities.invokeLater(() -> {
-                commandWindow.setVisible(true);
-            });
-            Login.main(new String[0]);
+            SwingUtilities.invokeLater(() -> commandWindow.setVisible(true));
         } else{
             out = System.out;
-            Login.main(new String[0]);
         }
+        Login.main(new String[0]);
     }
 
     private static class NullOutputStream extends OutputStream {
@@ -38,16 +33,10 @@ public class Main{
         }
 
         @Override
-        public void write(int b){
-            return;
-            }
+        public void write(int b){}
         @Override
-        public void write(byte[] b){
-            return;
-            }
+        public void write(byte[] b){}
         @Override
-        public void write(byte[] b, int off, int len){
-            return;
-        }
+        public void write(byte[] b, int off, int len){}
     }
 }

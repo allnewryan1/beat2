@@ -1,7 +1,7 @@
 package com.gladen.beat;
 
-/**
- * COPYRIGHT Gladen Software 2018
+/*
+ * COPYRIGHT Gladen Software 2020
  */
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -32,6 +32,8 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 
+import javax.swing.*;
+
 public class Controller extends AudioEventAdapter  {
     String desiredChannel = "";
     public Queue q;
@@ -47,16 +49,13 @@ public class Controller extends AudioEventAdapter  {
         player = playerManager.createPlayer();
         player.addListener(this);
         player.setVolume(Config.volume);
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                disconnectVoice();
-                Login.Jda.shutdownNow();
-                System.out.flush();
-                System.err.flush();
-                if (!Config.DEBUG) System.setErr(Main.err);
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            disconnectVoice();
+            Login.Jda.shutdownNow();
+            System.out.flush();
+            System.err.flush();
+            if (build.type == build.TYPE.DEBUG) System.setErr(Main.err);
+        }));
         init();
     }
 
@@ -84,6 +83,7 @@ public class Controller extends AudioEventAdapter  {
     @SuppressWarnings("unused")
     private boolean connectVoice(String server) {
         cChannel = Login.Jda.getVoiceChannelById(server);
+        if (cChannel == null) return false;
         AudioManager audioManager = cChannel.getGuild().getAudioManager();
         try {
             audioManager.openAudioConnection(cChannel);
@@ -104,10 +104,11 @@ public class Controller extends AudioEventAdapter  {
             audioManager.setSendingHandler(null);
             desiredChannel = "";
         } else {
-            //we aren't connected......
+            Debug.log("we aren't connected......");
         }
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isVoiceConnected() {
         if (cChannel == null) return false;
         return cChannel.getGuild().getAudioManager().isConnected();
@@ -134,10 +135,20 @@ public class Controller extends AudioEventAdapter  {
         Login.Jda.getPresence().setActivity(null);
     }
 
+    public void pause() {
+        player.setPaused(true);
+        Main.out.println("Playback paused");
+    }
+
     public void play() {
         if (!isPlaying()) {
             startPlayback();
-        } else ; //already playing, no point in interrupting for nothing
+        } else {
+            if (player.isPaused()) {
+                Main.out.println("Resuming playback");
+                player.setPaused(false);
+            }
+        } //already playing, no point in interrupting for nothing
         //TODO might merge startPlayback() and this function together
     }
 
@@ -158,8 +169,11 @@ public class Controller extends AudioEventAdapter  {
     }
 
     public boolean isPlaying() {
-        if (player.getPlayingTrack() != null) return true;
-        else return false;
+        return player.getPlayingTrack() != null;
+    }
+
+    public boolean isPaused() {
+        return isPlaying() && player.isPaused();
     }
 
     public AudioTrack getPlayingTrack() {
@@ -181,6 +195,7 @@ public class Controller extends AudioEventAdapter  {
             @Override
             public void trackLoaded(AudioTrack track) {
                 Main.out.println("[Now Playing] " + track.getInfo().title);
+                SwingUtilities.invokeLater(() -> CommandWindow.updatePlayingTrack(track.getInfo().title));
                 player.startTrack(track, false);
                 Login.Jda.getPresence().setActivity(Activity.listening("▶ " + track.getInfo().title));
                 String uri = track.getInfo().uri;
@@ -225,7 +240,9 @@ public class Controller extends AudioEventAdapter  {
 
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
-        nextTrack();
+        Main.out.println("Error playing track: " + exception.getMessage());
+        exception.printStackTrace();
+        //nextTrack();
     }
 
     @Override
@@ -302,7 +319,7 @@ public class Controller extends AudioEventAdapter  {
 
 
 
-    private List<AudioLoadResultCallback> callbacks = new ArrayList<>();
+    private final List<AudioLoadResultCallback> callbacks = new ArrayList<>();
 
     protected void registerEventListener(AudioLoadResultCallback callback) {
         this.callbacks.add(callback);
@@ -321,7 +338,7 @@ public class Controller extends AudioEventAdapter  {
 
     public class Queue {
 
-        private List<String> queue = new ArrayList<>();
+        private final List<String> queue = new ArrayList<>();
         final static String property = "java.io.tmpdir";
         final String tempDir = System.getProperty(property);
         final String cacheFile = tempDir + "beatCache";
@@ -336,12 +353,10 @@ public class Controller extends AudioEventAdapter  {
                 while (scanner.hasNextLine()) {
                     queue.add(scanner.nextLine());
                 }
-                scanner.close();
             } catch (FileNotFoundException e) {
                 System.err.println("Could not find songs.txt");
             }
             proccessTracks(queue);
-            file = null;
         }
 
         public List<TrackInfo> list() {
@@ -378,6 +393,7 @@ public class Controller extends AudioEventAdapter  {
             onModify();
         }
 
+        @SuppressWarnings("ResultOfMethodCallIgnored")
         public void onModify() {
             //TODO write playlist to disk
             File cFile = new File(cacheFile);
@@ -391,7 +407,6 @@ public class Controller extends AudioEventAdapter  {
                     writer.newLine();
                     }
                 writer.close();
-                cFile = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }

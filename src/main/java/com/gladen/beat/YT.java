@@ -1,7 +1,7 @@
 package com.gladen.beat;
 
-/**
- * COPYRIGHT Gladen Software 2018
+/*
+ * COPYRIGHT Gladen Software 2020
  */
 
 import java.io.BufferedReader;
@@ -38,21 +38,19 @@ public class YT {
                 InputStream input = con.getInputStream();
 
                 BufferedReader bR = new BufferedReader(new InputStreamReader(input));
-                String line = "";
+                String line;
                 StringBuilder sb = new StringBuilder();
-                while((line =  bR.readLine()) != null){
+                while((line = bR.readLine()) != null){
                     sb.append(line);
                     }
                 input.close();
                 con.disconnect();
-                input = null;
-                con = null;
 
                 JSONObject result = new JSONObject(sb.toString());
                 JSONArray list = result.getJSONArray("items");
                 JSONObject first = list.getJSONObject(0);
                 JSONObject id = first.getJSONObject("id");
-                String finalUrl = "";
+                String finalUrl;
                 try {
                     finalUrl = playUrl + id.getString("videoId");
                 } catch (JSONException e) {
@@ -60,21 +58,18 @@ public class YT {
                     return "";
                 }
                 return finalUrl;
-            } else if (responseCode == 400) {
-
+            }  else {
                 InputStream input = con.getErrorStream();
 
                 BufferedReader bR = new BufferedReader(new InputStreamReader(input));
-                String line = "";
+                String line;
                 StringBuilder sb = new StringBuilder();
                 while((line =  bR.readLine()) != null){
                     sb.append(line);
-                    }
+                }
                 input.close();
                 con.disconnect();
-                input = null;
-                con = null;
-                System.out.println(sb.toString());
+                Debug.log(sb.toString());
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -98,15 +93,13 @@ public class YT {
             if (responseCode == 200) {
                 InputStream input = con.getInputStream();
                 BufferedReader bR = new BufferedReader(new InputStreamReader(input));
-                String line = "";
+                String line;
                 StringBuilder sb = new StringBuilder();
                 while((line =  bR.readLine()) != null){
                     sb.append(line);
                     }
                 input.close();
                 con.disconnect();
-                input = null;
-                con = null;
 
                 JSONObject result = new JSONObject(sb.toString());
                 JSONArray list = result.getJSONArray("items");
@@ -117,19 +110,17 @@ public class YT {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            } else if (responseCode == 400) {
+            } else {
                 InputStream input = con.getErrorStream();
                 BufferedReader bR = new BufferedReader(new InputStreamReader(input));
-                String line = "";
+                String line;
                 StringBuilder sb = new StringBuilder();
                 while((line =  bR.readLine()) != null){
                     sb.append(line);
                     }
                 input.close();
                 con.disconnect();
-                input = null;
-                con = null;
-                System.out.println(sb.toString());
+                Debug.log(sb.toString());
             }
         } catch (IOException ex) {
             ex.printStackTrace();

@@ -1,7 +1,7 @@
 package com.gladen.beat;
 
-/**
- * COPYRIGHT Gladen Software 2018
+/*
+ * COPYRIGHT Gladen Software 2020
  */
 
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -26,7 +26,7 @@ public class MessageHandler extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-        if(e.getAuthor().isBot()) return;
+        if(e.getMember() == null || e.getMember().getVoiceState() == null || e.getAuthor().isBot()) return;
         String msg = e.getMessage().getContentRaw().toLowerCase();
         if (!msg.startsWith(PF)) return;
         VoiceChannel userChannel = e.getMember().getVoiceState().getChannel();
@@ -79,6 +79,7 @@ public class MessageHandler extends ListenerAdapter {
                 c.sendMessage(new EmbedBuilder()
                     .setTitle("Available Commands")
                     .addField("'play', 'play (search string)''", "With no args, plays the current queue. With (search string) plays the first result returned from YouTube", false)
+                    .addField("pause", "pauses playback, use 'play' to resume", false)
                     .addField("add", "adds a song to the queue but does not immediately begin playback", false)
                     .addField("stop", "Stops playback, does not currently reset the queue (next 'play' command will start next song in queue)", false)
                     .addField("'nowplaying', 'now', 'np'", "Displays the current song info", false)
@@ -115,6 +116,10 @@ public class MessageHandler extends ListenerAdapter {
                     .setThumbnail(String.format("https://img.youtube.com/vi/%s/hqdefault.jpg", PlayingTrack.getInfo().identifier))
                     .build()).queue();
                 break;
+            case "pause":
+                c.sendMessage("Playback paused").queue();
+                Login.audio.pause();
+                break;
             case "stop":
                 c.sendMessage("Playback stopped").queue();
                 Login.audio.stop();
@@ -131,12 +136,12 @@ public class MessageHandler extends ListenerAdapter {
                 }
                 String addUrl = yt.query(args[1]);
                 Login.audio.q.add(addUrl);
-                Login.audio.q.onModify();
                 String title = yt.getTrackInfo(addUrl).title;
                 c.sendMessage("Added \"" + title + "\" to the queue").queue();
                 break;
             case "play":
                 if (args[1] == null || args[1].isEmpty()) {
+                    if (Login.audio.isPaused()) c.sendMessage("Resuming playback").queue();
                     Login.audio.play();
                     break;
                 }
@@ -178,7 +183,10 @@ public class MessageHandler extends ListenerAdapter {
                     boolean shortlist = true;
                     try {
                         if (args[2] !=null && args[2].equals("all")) shortlist = false;
-                    } catch (ArrayIndexOutOfBoundsException fuckingStupid) {}
+                    } catch (ArrayIndexOutOfBoundsException fuckingStupid) {
+                        Debug.log("Array error");
+                        Debug.log(fuckingStupid.toString());
+                    }
                     EmbedBuilder list = new EmbedBuilder();
                     List<Controller.TrackInfo> infoList = Login.audio.q.list();
                     list.setTitle("Queue");
@@ -188,8 +196,8 @@ public class MessageHandler extends ListenerAdapter {
                     if (!nowplaying.isEmpty()) list.addField("Now Playing:", nowplaying, false);
                     for (int i = 0; i < infoList.size(); i++) {
                         info = infoList.get(i);
-                        if (nowplaying.equals(info.title)) ; //do fuckall
-                        else list.addField(String.valueOf(infoList.indexOf(info) + 1) + ":", info.title, false);
+                        if (nowplaying.equals(info.title)) Debug.log("already playing track"); //do fuckall
+                        else list.addField((infoList.indexOf(info) + 1) + ":", info.title, false);
                         if (shortlist && i == 5) i = infoList.size();
                         }
                     c.sendMessage(list.build()).queue();
@@ -200,12 +208,13 @@ public class MessageHandler extends ListenerAdapter {
                     } if (args[1].equals("remove")) {
                         if (args[2] != null) {
                             try {
-                                int pos = Integer.valueOf(args[2]) - 1;
+                                int pos = Integer.parseInt(args[2]) - 1;
                                 String removedUrl = Login.audio.q.remove(pos);
                                 String removedTitle = yt.getTrackInfo(removedUrl).title;
                                 c.sendMessage("Removed: " + removedTitle).queue();
                                 break;
                             } catch (NumberFormatException ex) {
+                                Debug.log(ex.toString());
                             }
                         }
                         c.sendMessage(new EmbedBuilder()
